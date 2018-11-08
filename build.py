@@ -78,6 +78,7 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
     min_dev_loss = float('inf')
     print('\n{}'.format(model))
     for i in range(epoch):
+        model.train()
         for step, (sent_batch, label_batch) in enumerate(train_loader):
             batch_loss, batch_acc = get_metric(model, loss_func, sent_batch, label_batch)
             optimizer.zero_grad()
@@ -86,6 +87,7 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
             if detail:
                 print('\n%s %d - loss: %.3f - acc: %.3f' % ('step', step + 1, batch_loss, batch_acc))
         with torch.no_grad():
+            model.eval()
             train_loss, train_acc = get_metric(model, loss_func, train_sents, train_labels)
             dev_loss, dev_acc = get_metric(model, loss_func, dev_sents, dev_labels)
         info = '\n{} {} - loss: {:.3f} - acc: {:.3f} - val_loss: {:.3f} - val_acc: {:.3f}, '.format(

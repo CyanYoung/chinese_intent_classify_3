@@ -59,6 +59,7 @@ def predict(text, name):
     sent = torch.LongTensor(pad_seq)
     model = map_item(name, models)
     with torch.no_grad():
+        model.eval()
         probs = F.softmax(model(sent), 1)
     probs = probs.numpy()[0]
     sort_probs = sorted(probs, reverse=True)
