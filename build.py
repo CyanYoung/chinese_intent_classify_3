@@ -88,8 +88,8 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
     min_dev_loss = float('inf')
     print('\n{}'.format(model))
     for i in range(epoch):
-        start = time.time()
         model.train()
+        start = time.time()
         for step, (sent_batch, label_batch) in enumerate(train_loader):
             batch_loss, batch_acc = get_metric(model, loss_func, sent_batch, label_batch)
             optimizer.zero_grad()
