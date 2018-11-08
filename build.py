@@ -27,10 +27,7 @@ archs = {'dnn': Dnn,
 
 paths = {'dnn': 'model/dnn.pkl',
          'cnn': 'model/cnn.pkl',
-         'rnn': 'model/rnn.pkl',
-         'dnn_plot': 'model/plot/dnn.png',
-         'cnn_plot': 'model/plot/cnn.png',
-         'rnn_plot': 'model/plot/rnn.png'}
+         'rnn': 'model/rnn.pkl'}
 
 
 def load_feat(path_feats):
