@@ -5,6 +5,7 @@ import re
 import numpy as np
 
 import torch
+import torch.nn.functional as F
 
 from keras.preprocessing.sequence import pad_sequences
 
@@ -58,10 +59,11 @@ def predict(text, name):
     sent = torch.LongTensor(pad_seq)
     model = map_item(name, models)
     with torch.no_grad():
-        probs = model(sent).numpy()
-        sort_probs = sorted(probs, reverse=True)
-        sort_inds = np.argsort(-probs)
-        sort_preds = [ind_labels[ind] for ind in sort_inds]
+        probs = F.softmax(model(sent), 1)
+    probs = probs.numpy()[0]
+    sort_probs = sorted(probs, reverse=True)
+    sort_inds = np.argsort(-probs)
+    sort_preds = [ind_labels[ind] for ind in sort_inds]
     formats = list()
     for pred, prob in zip(sort_preds, sort_probs):
         formats.append('{} {:.3f}'.format(pred, prob))

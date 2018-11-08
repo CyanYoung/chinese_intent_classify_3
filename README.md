@@ -1,10 +1,10 @@
-## Chinese Intent Classify 2018-9
+## Chinese Intent Classify 2018-11
 
 #### 1.preprocess
 
 prepare() 将按类文件保存的数据汇总、去重，去除停用词，统一替换地区、时间
 
-等特殊词，word_replace() 替换同音、同义词，打乱后划分为训练、测试数据
+等特殊词，word_replace() 替换同音、同义词，打乱后划分 train、dev、test
 
 #### 2.explore
 
