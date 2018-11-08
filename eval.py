@@ -1,10 +1,9 @@
 import pickle as pk
 
-import numpy as np
+import torch
+import torch.nn.functional as F
 
-from keras.models import load_model
-
-from sklearn.metrics import accuracy_score
+from classify import ind2label
 
 from util import flat_read, map_item
 
@@ -21,25 +20,27 @@ with open(path_label, 'rb') as f:
 with open(path_label_ind, 'rb') as f:
     label_inds = pk.load(f)
 
-ind_labels = dict()
-for label, ind in label_inds.items():
-    ind_labels[ind] = label
+ind_labels = ind2label(label_inds)
 
-paths = {'dnn': 'model/dnn.h5',
-         'cnn': 'model/cnn.h5',
-         'rnn': 'model/rnn.h5'}
+paths = {'dnn': 'model/dnn.pkl',
+         'cnn': 'model/cnn.pkl',
+         'rnn': 'model/rnn.pkl'}
 
-models = {'dnn': load_model(map_item('dnn', paths)),
-          'cnn': load_model(map_item('cnn', paths)),
-          'rnn': load_model(map_item('rnn', paths))}
+models = {'dnn': torch.load(map_item('dnn', paths)),
+          'cnn': torch.load(map_item('cnn', paths)),
+          'rnn': torch.load(map_item('rnn', paths))}
 
 
 def test(name, sents, labels):
+    sents, labels = torch.LongTensor(sents), torch.LongTensor(labels)
     model = map_item(name, models)
-    probs = model.predict(sents)
-    preds = np.argmax(probs, axis=1)
-    print('\n%s %s %.2f\n' % (name, 'acc:', accuracy_score(labels, preds)))
-    for text, label, pred in zip(texts, labels, preds):
+    with torch.no_grad():
+        model.eval()
+        probs = F.softmax(model(sents), 1)
+    preds = torch.max(probs, 1)[1]
+    acc = (preds == labels).sum().item() / len(preds)
+    print('\n%s acc: %.2f\n' % (name, acc))
+    for text, label, pred in zip(texts, labels.numpy(), preds.numpy()):
         if label != pred:
             print('{}: {} -> {}'.format(text, ind_labels[label], ind_labels[pred]))
 
