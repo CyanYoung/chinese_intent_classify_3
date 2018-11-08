@@ -32,12 +32,15 @@ class Cnn(nn.Module):
         self.class_num = class_num
         self.embed = nn.Embedding(self.vocab_num, self.embed_len, _weight=embed_mat)
         self.cap1 = nn.Sequential(nn.Conv1d(self.embed_len, 64, kernel_size=1),
+                                  nn.BatchNorm1d(64),
                                   nn.ReLU(),
                                   nn.MaxPool1d(seq_len))
         self.cap2 = nn.Sequential(nn.Conv1d(self.embed_len, 64, kernel_size=2),
+                                  nn.BatchNorm1d(64),
                                   nn.ReLU(),
                                   nn.MaxPool1d(seq_len - 1))
         self.cap3 = nn.Sequential(nn.Conv1d(self.embed_len, 64, kernel_size=3),
+                                  nn.BatchNorm1d(64),
                                   nn.ReLU(),
                                   nn.MaxPool1d(seq_len - 2))
         self.da = nn.Sequential(nn.Linear(192, 200),
