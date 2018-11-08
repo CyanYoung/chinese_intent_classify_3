@@ -83,8 +83,7 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
     embed_mat = torch.Tensor(embed_mat)
     seq_len = len(train_sents[0])
     arch = map_item(name, archs)
-    model = arch(embed_mat, seq_len, class_num)
-    model.to(device)
+    model = arch(embed_mat, seq_len, class_num).to(device)
     loss_func = CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=1e-3)
     min_dev_loss = float('inf')
@@ -106,7 +105,7 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
             dev_loss, dev_acc = get_metric(model, loss_func, dev_sents, dev_labels)
         extra = ''
         if dev_loss < min_dev_loss:
-            extra = ', val_loss reduce {:.3f}'.format(min_dev_loss - dev_loss, name)
+            extra = ', val_loss reduce {:.3f}'.format(min_dev_loss - dev_loss)
             torch.save(model, map_item(name, paths))
             min_dev_loss = dev_loss
         epoch_print(i, delta, train_loss, train_acc, dev_loss, dev_acc, extra)
