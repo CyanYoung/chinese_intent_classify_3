@@ -72,9 +72,8 @@ def step_print(step, batch_loss, batch_acc):
 
 
 def epoch_print(epoch, delta, train_loss, train_acc, dev_loss, dev_acc, extra):
-    basic = '\n{} {} - {:.2f}s - loss: {:.3f} - acc: {:.3f} - val_loss: {:.3f} - val_acc: {:.3f}'.format(
-            'epoch', epoch + 1, delta, train_loss, train_acc, dev_loss, dev_acc)
-    print(basic + extra)
+    print('\n{} {} - {:.2f}s - loss: {:.3f} - acc: {:.3f} - val_loss: {:.3f} - val_acc: {:.3f}'.format(
+          'epoch', epoch + 1, delta, train_loss, train_acc, dev_loss, dev_acc) + extra)
 
 
 def fit(name, epoch, embed_mat, class_num, path_feats, detail):
