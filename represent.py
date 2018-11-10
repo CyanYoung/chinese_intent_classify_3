@@ -46,12 +46,12 @@ def label2ind(labels, path_label_ind):
         pk.dump(label_inds, f)
 
 
-def sent2ind(words, word_inds, oov_ind):
+def sent2ind(words, word_inds, oov_ind, keep_oov):
     seq = list()
     for word in words:
         if word in word_inds:
             seq.append(word_inds[word] + 1)
-        elif oov_ind:
+        elif keep_oov:
             seq.append(oov_ind)
     if len(seq) < seq_len:
         return [0] * (seq_len - len(seq)) + seq
@@ -59,15 +59,15 @@ def sent2ind(words, word_inds, oov_ind):
         return seq[-seq_len:]
 
 
-def align(sent_words, labels, path_sent, path_label, keep_oov):
+def align(sent_words, labels, path_sent, path_label):
     with open(path_word_ind, 'rb') as f:
         word_inds = pk.load(f)
     with open(path_embed, 'rb') as f:
         embed_mat = pk.load(f)
-    oov_ind = len(embed_mat) - 1 if keep_oov else 0
     pad_seqs = list()
     for words in sent_words:
-        pad_seqs.append(sent2ind(words, word_inds, oov_ind))
+        pad_seq = sent2ind(words, word_inds, len(embed_mat) - 1, keep_oov=False)
+        pad_seqs.append(pad_seq)
     pad_seqs = np.array(pad_seqs)
     with open(path_label_ind, 'rb') as f:
         label_inds = pk.load(f)
@@ -88,7 +88,7 @@ def vectorize(path_data, path_sent, path_label, mode):
     if mode == 'train':
         embed(sent_words, path_word_ind, path_word_vec, path_embed)
         label2ind(labels, path_label_ind)
-    align(sent_words, labels, path_sent, path_label, keep_oov=False)
+    align(sent_words, labels, path_sent, path_label)
 
 
 if __name__ == '__main__':
