@@ -66,7 +66,7 @@ def align(sent_words, labels, path_sent, path_label):
         embed_mat = pk.load(f)
     pad_seqs = list()
     for words in sent_words:
-        pad_seq = sent2ind(words, word_inds, len(embed_mat) - 1, keep_oov=False)
+        pad_seq = sent2ind(words, word_inds, len(embed_mat) - 1, keep_oov=True)
         pad_seqs.append(pad_seq)
     pad_seqs = np.array(pad_seqs)
     with open(path_label_ind, 'rb') as f:

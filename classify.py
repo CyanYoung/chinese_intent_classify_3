@@ -30,13 +30,17 @@ word_type_re = load_type_re(path_type_dir)
 homo_dict = load_pair(path_homo)
 syno_dict = load_pair(path_syno)
 
-path_word2ind = 'model/word2ind.pkl'
+path_word_ind = 'feat/word_ind.pkl'
+path_embed = 'feat/embed.pkl'
 path_label_ind = 'feat/label_ind.pkl'
-with open(path_word2ind, 'rb') as f:
-    word2ind = pk.load(f)
+with open(path_word_ind, 'rb') as f:
+    word_inds = pk.load(f)
+with open(path_embed, 'rb') as f:
+    embed_mat = pk.load(f)
 with open(path_label_ind, 'rb') as f:
     label_inds = pk.load(f)
 
+oov_ind = len(embed_mat) - 1
 ind_labels = ind2label(label_inds)
 
 paths = {'dnn': 'model/dnn.pkl',
@@ -54,7 +58,7 @@ def predict(text, name):
         text = re.sub(word_re, word_type, text)
     text = word_replace(text, homo_dict)
     text = word_replace(text, syno_dict)
-    pad_seq = sent2ind(list(text), word2ind, del_oov=True)
+    pad_seq = sent2ind(list(text), word_inds, oov_ind, keep_oov=True)
     sent = torch.LongTensor([pad_seq])
     model = map_item(name, models)
     with torch.no_grad():
