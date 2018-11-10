@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from keras.preprocessing.sequence import pad_sequences
+from represent import sent2ind
 
 from util import load_word_re, load_type_re, load_pair, word_replace, map_item
 
@@ -54,9 +54,8 @@ def predict(text, name):
         text = re.sub(word_re, word_type, text)
     text = word_replace(text, homo_dict)
     text = word_replace(text, syno_dict)
-    seq = word2ind.texts_to_sequences([text])[0]
-    pad_seq = pad_sequences([seq], maxlen=seq_len)
-    sent = torch.LongTensor(pad_seq)
+    pad_seq = sent2ind(list(text), word2ind, del_oov=True)
+    sent = torch.LongTensor([pad_seq])
     model = map_item(name, models)
     with torch.no_grad():
         model.eval()
