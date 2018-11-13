@@ -68,15 +68,15 @@ def get_metric(model, loss_func, sents, labels):
 
 
 def step_print(step, batch_loss, batch_acc):
-    print('\n{} {} - loss: {:.3f} - acc: {:.3f}'.format('step', step + 1, batch_loss, batch_acc))
+    print('\n{} {} - loss: {:.3f} - acc: {:.3f}'.format('step', step, batch_loss, batch_acc))
 
 
 def epoch_print(epoch, delta, train_loss, train_acc, dev_loss, dev_acc, extra):
     print('\n{} {} - {:.2f}s - loss: {:.3f} - acc: {:.3f} - val_loss: {:.3f} - val_acc: {:.3f}'.format(
-          'epoch', epoch + 1, delta, train_loss, train_acc, dev_loss, dev_acc) + extra)
+          'epoch', epoch, delta, train_loss, train_acc, dev_loss, dev_acc) + extra)
 
 
-def fit(name, epoch, embed_mat, class_num, path_feats, detail):
+def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
     train_sents, train_labels, dev_sents, dev_labels = tensorize(path_feats)
     train_loader = get_loader(train_sents, train_labels)
     embed_mat = torch.Tensor(embed_mat)
@@ -84,11 +84,15 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
     arch = map_item(name, archs)
     model = arch(embed_mat, seq_len, class_num).to(device)
     loss_func = CrossEntropyLoss()
-    optimizer = Adam(model.parameters(), lr=1e-3)
+    learn_rate, min_rate = 1e-3, 1e-5
     min_dev_loss = float('inf')
+    trap_count, max_count = 0, 3
     print('\n{}'.format(model))
-    for i in range(epoch):
+    train, epoch = True, 0
+    while train and epoch < max_epoch:
+        epoch = epoch + 1
         model.train()
+        optimizer = Adam(model.parameters(), lr=learn_rate)
         start = time.time()
         for step, (sent_batch, label_batch) in enumerate(train_loader):
             batch_loss, batch_acc = get_metric(model, loss_func, sent_batch, label_batch)
@@ -96,7 +100,7 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
             batch_loss.backward()
             optimizer.step()
             if detail:
-                step_print(step, batch_loss, batch_acc)
+                step_print(step + 1, batch_loss, batch_acc)
         delta = time.time() - start
         with torch.no_grad():
             model.eval()
@@ -104,10 +108,21 @@ def fit(name, epoch, embed_mat, class_num, path_feats, detail):
             dev_loss, dev_acc = get_metric(model, loss_func, dev_sents, dev_labels)
         extra = ''
         if dev_loss < min_dev_loss:
-            extra = ', val_loss reduce {:.3f}'.format(min_dev_loss - dev_loss)
-            torch.save(model, map_item(name, paths))
+            extra = ', val_loss reduce by {:.3f}'.format(min_dev_loss - dev_loss)
             min_dev_loss = dev_loss
-        epoch_print(i, delta, train_loss, train_acc, dev_loss, dev_acc, extra)
+            trap_count = 0
+            torch.save(model, map_item(name, paths))
+        else:
+            trap_count = trap_count + 1
+            if trap_count > max_count:
+                learn_rate = learn_rate / 10
+                if learn_rate < min_rate:
+                    extra = ', early stop'
+                    train = False
+                else:
+                    extra = ', learn_rate divide by 10'
+                    trap_count = 0
+        epoch_print(epoch, delta, train_loss, train_acc, dev_loss, dev_acc, extra)
 
 
 if __name__ == '__main__':
@@ -116,6 +131,6 @@ if __name__ == '__main__':
     path_feats['label_train'] = 'feat/label_train.pkl'
     path_feats['sent_dev'] = 'feat/sent_dev.pkl'
     path_feats['label_dev'] = 'feat/label_dev.pkl'
-    fit('dnn', 10, embed_mat, class_num, path_feats, detail=False)
-    fit('cnn', 10, embed_mat, class_num, path_feats, detail=False)
-    fit('rnn', 10, embed_mat, class_num, path_feats, detail=False)
+    fit('dnn', 50, embed_mat, class_num, path_feats, detail=False)
+    fit('cnn', 50, embed_mat, class_num, path_feats, detail=False)
+    fit('rnn', 50, embed_mat, class_num, path_feats, detail=False)
