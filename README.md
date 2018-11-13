@@ -22,9 +22,11 @@ sent2ind() 将每句转换为词索引，并将序列填充为相同长度
 
 #### 4.build
 
-tensorize() 将 numpy array 转换为 torch LongTensor
+tensorize() 将 array 转换为 LongTensor，get_loader() 打乱并划分 batch
 
-get_loader() 打乱并划分 batch，通过 dnn、cnn、rnn 构建分类模型
+通过 dnn、cnn、rnn 构建分类模型，dev_loss 降低则保存模型
+
+trap_count > max_count 降低 learn_rate、小于 min_rate 则早停止
 
 #### 5.classify
 
