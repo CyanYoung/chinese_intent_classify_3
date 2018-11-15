@@ -26,7 +26,7 @@ tensorize() 将 array 转换为 LongTensor，get_loader() 打乱并划分 batch
 
 通过 dnn、cnn、rnn 构建分类模型，dev_loss 降低则保存模型
 
-trap_count > max_count 降低 learn_rate、小于 min_rate 则早停止
+trap_count > max_count 则 learn_rate / 10、小于 min_rate 则早停止
 
 #### 5.classify
 
