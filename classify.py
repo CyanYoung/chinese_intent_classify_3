@@ -58,7 +58,7 @@ def predict(text, name):
         text = re.sub(word_re, word_type, text)
     text = word_replace(text, homo_dict)
     text = word_replace(text, syno_dict)
-    pad_seq = sent2ind(list(text), word_inds, oov_ind, keep_oov=True)
+    pad_seq = sent2ind(text, word_inds, seq_len, oov_ind, keep_oov=True)
     sent = torch.LongTensor([pad_seq])
     model = map_item(name, models)
     with torch.no_grad():

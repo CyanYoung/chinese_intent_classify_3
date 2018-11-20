@@ -46,7 +46,7 @@ def label2ind(labels, path_label_ind):
         pk.dump(label_inds, f)
 
 
-def sent2ind(words, word_inds, oov_ind, keep_oov):
+def sent2ind(words, word_inds, seq_len, oov_ind, keep_oov):
     seq = list()
     for word in words:
         if word in word_inds:
@@ -64,9 +64,10 @@ def align(sent_words, labels, path_sent, path_label):
         word_inds = pk.load(f)
     with open(path_embed, 'rb') as f:
         embed_mat = pk.load(f)
+    oov_ind = len(embed_mat) - 1
     pad_seqs = list()
     for words in sent_words:
-        pad_seq = sent2ind(words, word_inds, len(embed_mat) - 1, keep_oov=True)
+        pad_seq = sent2ind(words, word_inds, seq_len, oov_ind, keep_oov=True)
         pad_seqs.append(pad_seq)
     pad_seqs = np.array(pad_seqs)
     with open(path_label_ind, 'rb') as f:
