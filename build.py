@@ -94,8 +94,8 @@ def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
         model.train()
         optimizer = Adam(model.parameters(), lr=learn_rate)
         start = time.time()
-        for step, (sent_batch, label_batch) in enumerate(train_loader):
-            batch_loss, batch_acc = get_metric(model, loss_func, sent_batch, label_batch)
+        for step, (sents, labels) in enumerate(train_loader):
+            batch_loss, batch_acc = get_metric(model, loss_func, sents, labels)
             optimizer.zero_grad()
             batch_loss.backward()
             optimizer.step()
