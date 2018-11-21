@@ -12,15 +12,14 @@ from represent import sent2ind
 from util import load_word_re, load_type_re, load_pair, word_replace, map_item
 
 
-device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
 def ind2label(label_inds):
     ind_labels = dict()
     for word, ind in label_inds.items():
         ind_labels[ind] = word
     return ind_labels
 
+
+device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 seq_len = 30
 
