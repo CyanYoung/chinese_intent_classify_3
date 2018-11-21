@@ -12,6 +12,9 @@ from represent import sent2ind
 from util import load_word_re, load_type_re, load_pair, word_replace, map_item
 
 
+device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
 def ind2label(label_inds):
     ind_labels = dict()
     for word, ind in label_inds.items():
@@ -47,9 +50,9 @@ paths = {'dnn': 'model/dnn.pkl',
          'cnn': 'model/cnn.pkl',
          'rnn': 'model/rnn.pkl'}
 
-models = {'dnn': torch.load(map_item('dnn', paths)),
-          'cnn': torch.load(map_item('cnn', paths)),
-          'rnn': torch.load(map_item('rnn', paths))}
+models = {'dnn': torch.load(map_item('dnn', paths), map_location=device_str),
+          'cnn': torch.load(map_item('cnn', paths), map_location=device_str),
+          'rnn': torch.load(map_item('rnn', paths), map_location=device_str)}
 
 
 def predict(text, name):
