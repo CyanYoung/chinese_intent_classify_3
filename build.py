@@ -12,6 +12,8 @@ from nn_arch import Dnn, Cnn, Rnn
 from util import map_item
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 batch_size = 32
 
 path_embed = 'feat/embed.pkl'
@@ -30,8 +32,6 @@ archs = {'dnn': Dnn,
 paths = {'dnn': 'model/dnn.pkl',
          'cnn': 'model/cnn.pkl',
          'rnn': 'model/rnn.pkl'}
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def load_feat(path_feats):
