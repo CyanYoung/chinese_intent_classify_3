@@ -13,7 +13,7 @@ class Dnn(nn.Module):
                                  nn.ReLU())
         self.la2 = nn.Sequential(nn.Linear(200, 200),
                                  nn.ReLU())
-        self.ln = nn.Sequential(nn.Dropout(0.2),
+        self.dl = nn.Sequential(nn.Dropout(0.2),
                                 nn.Linear(200, self.class_num))
 
     def forward(self, x):
@@ -21,7 +21,7 @@ class Dnn(nn.Module):
         x = torch.mean(x, dim=1)
         x = self.la1(x)
         x = self.la2(x)
-        return self.ln(x)
+        return self.dl(x)
 
 
 class Cnn(nn.Module):
@@ -42,7 +42,7 @@ class Cnn(nn.Module):
                                   nn.MaxPool1d(seq_len))
         self.la = nn.Sequential(nn.Linear(192, 200),
                                 nn.ReLU())
-        self.ln = nn.Sequential(nn.Dropout(0.2),
+        self.dl = nn.Sequential(nn.Dropout(0.2),
                                 nn.Linear(200, self.class_num))
 
     def forward(self, x):
@@ -54,7 +54,7 @@ class Cnn(nn.Module):
         x = torch.cat((x1, x2, x3), dim=1)
         x = x.view(x.size(0), -1)
         x = self.la(x)
-        return self.ln(x)
+        return self.dl(x)
 
 
 class Rnn(nn.Module):
@@ -65,11 +65,11 @@ class Rnn(nn.Module):
         self.class_num = class_num
         self.embed = nn.Embedding(self.vocab_num, self.embed_len, _weight=embed_mat)
         self.ra = nn.LSTM(self.embed_len, 200, batch_first=True)
-        self.ln = nn.Sequential(nn.Dropout(0.2),
+        self.dl = nn.Sequential(nn.Dropout(0.2),
                                 nn.Linear(200, self.class_num))
 
     def forward(self, x):
         x = self.embed(x)
         x, h_n = self.ra(x)
         x = x[:, -1, :]
-        return self.ln(x)
+        return self.dl(x)
