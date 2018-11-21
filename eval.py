@@ -8,8 +8,6 @@ from classify import ind2label
 from util import flat_read, map_item
 
 
-device_str = 'cuda' if torch.cuda.is_available() else 'cpu'
-
 path_test = 'data/test.csv'
 path_sent = 'feat/sent_test.pkl'
 path_label = 'feat/label_test.pkl'
@@ -28,9 +26,9 @@ paths = {'dnn': 'model/dnn.pkl',
          'cnn': 'model/cnn.pkl',
          'rnn': 'model/rnn.pkl'}
 
-models = {'dnn': torch.load(map_item('dnn', paths), map_location=device_str),
-          'cnn': torch.load(map_item('cnn', paths), map_location=device_str),
-          'rnn': torch.load(map_item('rnn', paths), map_location=device_str)}
+models = {'dnn': torch.load(map_item('dnn', paths), map_location='cpu'),
+          'cnn': torch.load(map_item('cnn', paths), map_location='cpu'),
+          'rnn': torch.load(map_item('rnn', paths), map_location='cpu')}
 
 
 def test(name, sents, labels):
