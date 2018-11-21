@@ -84,7 +84,7 @@ def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
     arch = map_item(name, archs)
     model = arch(embed_mat, seq_len, class_num).to(device)
     loss_func = CrossEntropyLoss()
-    learn_rate, min_rate = 1e-3, 1e-6
+    learn_rate, min_rate = 1e-3, 1e-5
     min_dev_loss = float('inf')
     trap_count, max_count = 0, 5
     print('\n{}'.format(model))
