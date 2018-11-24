@@ -41,6 +41,7 @@ with open(path_label_ind, 'rb') as f:
     label_inds = pk.load(f)
 
 oov_ind = len(embed_mat) - 1
+
 ind_labels = ind2label(label_inds)
 
 paths = {'dnn': 'model/dnn.pkl',
