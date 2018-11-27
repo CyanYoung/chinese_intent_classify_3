@@ -47,7 +47,7 @@ class Cnn(nn.Module):
 
     def forward(self, x):
         x = self.embed(x)
-        x = x.view(x.size(0), self.embed_len, -1)
+        x = x.permute(0, 2, 1)
         x1 = self.cap1(x)
         x2 = self.cap2(x)
         x3 = self.cap3(x)
