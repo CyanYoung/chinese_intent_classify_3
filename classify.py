@@ -19,6 +19,8 @@ def ind2label(label_inds):
     return ind_labels
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 seq_len = 30
 
 path_stop_word = 'dict/stop_word.txt'
@@ -48,9 +50,9 @@ paths = {'dnn': 'model/dnn.pkl',
          'cnn': 'model/cnn.pkl',
          'rnn': 'model/rnn.pkl'}
 
-models = {'dnn': torch.load(map_item('dnn', paths), map_location='cpu'),
-          'cnn': torch.load(map_item('cnn', paths), map_location='cpu'),
-          'rnn': torch.load(map_item('rnn', paths), map_location='cpu')}
+models = {'dnn': torch.load(map_item('dnn', paths), map_location=device),
+          'cnn': torch.load(map_item('cnn', paths), map_location=device),
+          'rnn': torch.load(map_item('rnn', paths), map_location=device)}
 
 
 def predict(text, name):
