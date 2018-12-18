@@ -12,7 +12,7 @@ from classify import ind2label
 from util import flat_read, map_item
 
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 path_test = 'data/test.csv'
 path_sent = 'feat/sent_test.pkl'

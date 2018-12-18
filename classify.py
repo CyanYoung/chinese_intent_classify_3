@@ -19,7 +19,7 @@ def ind2label(label_inds):
     return ind_labels
 
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 seq_len = 30
 

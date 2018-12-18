@@ -46,26 +46,6 @@ def load_feat(path_feats):
     return train_sents, train_labels, dev_sents, dev_labels
 
 
-def tensorize(feats, device):
-    tensors = list()
-    for feat in feats:
-        tensors.append(torch.LongTensor(feat).to(device))
-    return tensors
-
-
-def get_loader(sents, labels):
-    pairs = TensorDataset(sents, labels)
-    return DataLoader(pairs, batch_size=batch_size, shuffle=True)
-
-
-def get_metric(model, loss_func, sents, labels):
-    probs = model(sents)
-    preds = torch.max(probs, 1)[1]
-    loss = loss_func(probs, labels)
-    acc = (preds == labels).sum().item() / len(preds)
-    return loss, acc
-
-
 def step_print(step, batch_loss, batch_acc):
     print('\n{} {} - loss: {:.3f} - acc: {:.3f}'.format('step', step, batch_loss, batch_acc))
 
@@ -75,15 +55,59 @@ def epoch_print(epoch, delta, train_loss, train_acc, dev_loss, dev_acc, extra):
           'epoch', epoch, delta, train_loss, train_acc, dev_loss, dev_acc) + extra)
 
 
+def tensorize(feats, device):
+    tensors = list()
+    for feat in feats:
+        tensors.append(torch.LongTensor(feat).to(device))
+    return tensors
+
+
+def get_loader(pairs):
+    sents, labels = pairs
+    pairs = TensorDataset(sents, labels)
+    return DataLoader(pairs, batch_size, shuffle=True)
+
+
+def get_metric(model, loss_func, pairs):
+    sents, labels = pairs
+    probs = model(sents)
+    preds = torch.max(probs, 1)[1]
+    loss = loss_func(probs, labels)
+    acc = (preds == labels).sum().item()
+    return loss, acc, len(preds)
+
+
+def batch_train(model, loss_func, optimizer, loader, detail):
+    total_loss, total_acc, total_num = [0] * 3
+    for step, pairs in enumerate(loader):
+        batch_loss, batch_acc, batch_num = get_metric(model, loss_func, pairs)
+        optimizer.zero_grad()
+        batch_loss.backward()
+        optimizer.step()
+        total_loss = total_loss + batch_loss.item()
+        total_acc, total_num = total_acc + batch_acc, total_num + batch_num
+        if detail:
+            step_print(step + 1, batch_loss / batch_num, batch_acc / batch_num)
+    return total_loss / total_num, total_acc / total_num
+
+
+def batch_dev(model, loss_func, loader):
+    total_loss, total_acc, total_num = [0] * 3
+    for step, pairs in enumerate(loader):
+        batch_loss, batch_acc, batch_num = get_metric(model, loss_func, pairs)
+        total_loss = total_loss + batch_loss.item()
+        total_acc, total_num = total_acc + batch_acc, total_num + batch_num
+    return total_loss / total_num, total_acc / total_num
+
+
 def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
-    feats = load_feat(path_feats)
-    train_sents, train_labels, dev_sents, dev_labels = tensorize(feats, device)
-    train_loader = get_loader(train_sents, train_labels)
+    tensors = tensorize(load_feat(path_feats), device)
+    bound = int(len(tensors) / 2)
+    train_loader, dev_loader = get_loader(tensors[:bound]), get_loader(tensors[bound:])
     embed_mat = torch.Tensor(embed_mat)
-    seq_len = len(train_sents[0])
     arch = map_item(name, archs)
-    model = arch(embed_mat, seq_len, class_num).to(device)
-    loss_func = CrossEntropyLoss()
+    model = arch(embed_mat, class_num).to(device)
+    loss_func = CrossEntropyLoss(reduction='sum')
     learn_rate, min_rate = 1e-3, 1e-5
     min_dev_loss = float('inf')
     trap_count, max_count = 0, 5
@@ -94,18 +118,11 @@ def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
         model.train()
         optimizer = Adam(model.parameters(), lr=learn_rate)
         start = time.time()
-        for step, (sents, labels) in enumerate(train_loader):
-            batch_loss, batch_acc = get_metric(model, loss_func, sents, labels)
-            optimizer.zero_grad()
-            batch_loss.backward()
-            optimizer.step()
-            if detail:
-                step_print(step + 1, batch_loss, batch_acc)
+        train_loss, train_acc = batch_train(model, loss_func, optimizer, train_loader, detail)
         delta = time.time() - start
         with torch.no_grad():
             model.eval()
-            train_loss, train_acc = get_metric(model, loss_func, train_sents, train_labels)
-            dev_loss, dev_acc = get_metric(model, loss_func, dev_sents, dev_labels)
+            dev_loss, dev_acc = batch_dev(model, loss_func, dev_loader)
         extra = ''
         if dev_loss < min_dev_loss:
             extra = ', val_loss reduce by {:.3f}'.format(min_dev_loss - dev_loss)
