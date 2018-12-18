@@ -3,6 +3,10 @@ import pickle as pk
 import torch
 import torch.nn.functional as F
 
+from sklearn.metrics import accuracy_score
+
+from build import tensorize
+
 from classify import ind2label
 
 from util import flat_read, map_item
@@ -34,14 +38,13 @@ models = {'dnn': torch.load(map_item('dnn', paths), map_location=device),
 
 
 def test(name, sents, labels):
-    sents, labels = torch.LongTensor(sents), torch.LongTensor(labels)
+    sents, labels = tensorize([sents, labels], device)
     model = map_item(name, models)
     with torch.no_grad():
         model.eval()
         probs = F.softmax(model(sents), 1)
     preds = torch.max(probs, 1)[1]
-    acc = (preds == labels).sum().item() / len(preds)
-    print('\n%s acc: %.2f\n' % (name, acc))
+    print('\n%s %s %.2f\n' % (name, 'acc:', accuracy_score(labels, preds)))
     for text, label, pred in zip(texts, labels.numpy(), preds.numpy()):
         if label != pred:
             print('{}: {} -> {}'.format(text, ind_labels[label], ind_labels[pred]))
