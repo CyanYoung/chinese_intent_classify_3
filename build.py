@@ -79,7 +79,7 @@ def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
     feats = load_feat(path_feats)
     train_sents, train_labels, dev_sents, dev_labels = tensorize(feats, device)
     train_loader = get_loader(train_sents, train_labels)
-    embed_mat = torch.Tensor(embed_mat).to(device)
+    embed_mat = torch.Tensor(embed_mat)
     seq_len = len(train_sents[0])
     arch = map_item(name, archs)
     model = arch(embed_mat, seq_len, class_num).to(device)
