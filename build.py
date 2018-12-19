@@ -110,7 +110,7 @@ def fit(name, max_epoch, embed_mat, class_num, path_feats, detail):
     loss_func = CrossEntropyLoss(reduction='sum')
     learn_rate, min_rate = 1e-3, 1e-5
     min_dev_loss = float('inf')
-    trap_count, max_count = 0, 5
+    trap_count, max_count = 0, 3
     print('\n{}'.format(model))
     train, epoch = True, 0
     while train and epoch < max_epoch:
