@@ -14,9 +14,7 @@ prepare() 将按类文件保存的数据汇总、去重，去除停用词，统�
 
 Dictionary() 建立词索引的字典，filter_extremes() 过滤低频词
 
-embed() 通过 word_inds 与 word_vecs 建立词索引到词向量的映射
-
-label2ind() 建立标签索引的字典，sorted() 保持一致性
+tran_dict() 为填充词、未录词保留索引 0、1，label2ind() 建立标签索引的字典
 
 sent2ind() 将每句转换为词索引，并将序列填充为相同长度
 
