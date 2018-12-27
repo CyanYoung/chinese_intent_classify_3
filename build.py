@@ -70,9 +70,9 @@ def get_loader(pairs):
 
 def get_metric(model, loss_func, pairs):
     sents, labels = pairs
-    probs = model(sents)
-    preds = torch.max(probs, 1)[1]
-    loss = loss_func(probs, labels)
+    prods = model(sents)
+    preds = torch.max(prods, 1)[1]
+    loss = loss_func(prods, labels)
     acc = (preds == labels).sum().item()
     return loss, acc, len(preds)
 
