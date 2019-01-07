@@ -67,7 +67,6 @@ class Rnn(nn.Module):
 
     def forward(self, x):
         x = self.embed(x)
-        h, (h_n, c_n) = self.ra(x)
-        del h
-        x = h_n[0]
+        h, hc_n = self.ra(x)
+        x = h[:, -1, :]
         return self.dl(x)
