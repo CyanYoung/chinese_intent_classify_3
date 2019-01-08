@@ -14,8 +14,8 @@ from util import load_word_re, load_type_re, load_pair, word_replace, map_item
 
 def ind2label(label_inds):
     ind_labels = dict()
-    for word, ind in label_inds.items():
-        ind_labels[ind] = word
+    for label, ind in label_inds.items():
+        ind_labels[ind] = label
     return ind_labels
 
 
