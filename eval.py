@@ -43,7 +43,7 @@ def test(name, sents, labels):
     with torch.no_grad():
         model.eval()
         probs = F.softmax(model(sents), dim=1)
-    preds = torch.max(probs, 1)[1]
+    preds = torch.max(probs, dim=1)[1]
     print('\n%s %s %.2f\n' % (name, 'acc:', accuracy_score(labels, preds)))
     for text, label, pred in zip(texts, labels.numpy(), preds.numpy()):
         if label != pred:
