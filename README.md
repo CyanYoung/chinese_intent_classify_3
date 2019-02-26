@@ -28,4 +28,4 @@ trap_count > max_count 则 learn_rate / 10、小于 min_rate 则早停止
 
 #### 5.classify
 
-predict() 去除停用词，统一替换地区、时间等特殊词，输出所有类别的概率
+predict() 实时交互，输入单句、经过清洗后预测，输出所有类别的概率
