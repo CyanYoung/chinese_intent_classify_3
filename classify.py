@@ -42,6 +42,7 @@ models = {'dnn': torch.load(map_item('dnn', paths), map_location=device),
 
 
 def predict(text, name):
+    text = clean(text)
     pad_seq = sent2ind(text, word_inds, seq_len, keep_oov=True)
     sent = torch.LongTensor([pad_seq]).to(device)
     model = map_item(name, models)
@@ -61,7 +62,6 @@ def predict(text, name):
 if __name__ == '__main__':
     while True:
         text = input('text: ')
-        text = clean(text)
         print('dnn: %s' % predict(text, 'dnn'))
         print('cnn: %s' % predict(text, 'cnn'))
         print('rnn: %s' % predict(text, 'rnn'))
