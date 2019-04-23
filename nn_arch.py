@@ -61,12 +61,15 @@ class Rnn(nn.Module):
         super(Rnn, self).__init__()
         vocab_num, embed_len = embed_mat.size()
         self.embed = nn.Embedding(vocab_num, embed_len, _weight=embed_mat)
-        self.ra = nn.LSTM(embed_len, 200, batch_first=True)
+        self.ra = nn.LSTM(embed_len, 200, batch_first=True, bidirectional=True)
+        self.mp = nn.MaxPool1d(seq_len)
         self.dl = nn.Sequential(nn.Dropout(0.2),
-                                nn.Linear(200, class_num))
+                                nn.Linear(400, class_num))
 
     def forward(self, x):
         x = self.embed(x)
         h, hc_n = self.ra(x)
-        x = h[:, -1, :]
+        h = h.permute(0, 2, 1)
+        x = self.mp(h)
+        x = x.view(x.size(0), -1)
         return self.dl(x)
