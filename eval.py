@@ -25,9 +25,9 @@ with open(path_label, 'rb') as f:
 
 class_num = len(ind_labels)
 
-paths = {'dnn': 'stat/metric/dnn.csv',
-         'cnn': 'stat/metric/cnn.csv',
-         'rnn': 'stat/metric/rnn.csv'}
+paths = {'dnn': 'metric/dnn.csv',
+         'cnn': 'metric/cnn.csv',
+         'rnn': 'metric/rnn.csv'}
 
 
 def test(name, sents, labels):
