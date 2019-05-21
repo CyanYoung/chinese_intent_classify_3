@@ -30,7 +30,7 @@ paths = {'dnn': 'metric/dnn.csv',
          'rnn': 'metric/rnn.csv'}
 
 
-def test(name, sents, labels):
+def test(name, sents, labels, detail):
     sents, labels = tensorize([sents, labels], device)
     model = map_item(name, models)
     with torch.no_grad():
@@ -44,10 +44,14 @@ def test(name, sents, labels):
         for i in range(class_num):
             f.write('%s,%.2f,%.2f\n' % (ind_labels[i], precs[i], recs[i]))
     f1 = f1_score(labels, preds, average='weighted')
-    print('\n%s f1: %.2f - acc: %.2f' % (name, f1, accuracy_score(labels, preds)))
+    print('\n%s f1: %.2f - acc: %.2f\n' % (name, f1, accuracy_score(labels, preds)))
+    if detail:
+        for text, label, pred in zip(texts, labels.numpy(), preds.numpy()):
+            if label != pred:
+                print('{}: {} -> {}'.format(text, ind_labels[label], ind_labels[pred]))
 
 
 if __name__ == '__main__':
-    test('dnn', sents, labels)
-    test('cnn', sents, labels)
-    test('rnn', sents, labels)
+    test('dnn', sents, labels, detail=False)
+    test('cnn', sents, labels, detail=False)
+    test('rnn', sents, labels, detail=False)
