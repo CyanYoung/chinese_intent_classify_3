@@ -27,7 +27,3 @@ trap_count > max_count 则 learn_rate / 10、小于 min_rate 则早停止
 #### 5.classify
 
 predict() 实时交互，输入单句、经过清洗后预测，输出所有类别的概率
-
-#### 6.eval
-
-计算总体的正确率、f1 值，各类的精确率、召回率，显示错判样本
